@@ -1,0 +1,8 @@
+# visual studio code directory
+.vscode
+
+# build directory
+build/
+
+# test data directory
+data/
