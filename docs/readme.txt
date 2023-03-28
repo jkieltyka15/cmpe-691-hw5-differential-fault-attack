@@ -16,3 +16,4 @@ Build and Test:
 Notes
     * Simply using the command 'make' will build everything.
     * To clean the 'build/bin' directory, use the command 'make clean'.
+    * confirm results using: https://www.cryptool.org/en/cto/aes-step-by-step
