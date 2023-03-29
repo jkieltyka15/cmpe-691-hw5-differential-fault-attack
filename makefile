@@ -8,10 +8,10 @@ BUILD = ./build
 BDIR = $(BUILD)/bin
 ODIR = $(BUILD)/obj
 
-_DEPS = aes-crack.h
+_DEPS = aes-crack.h aes-sbox
 DEPS = $(patsubt %,$(IDIR)/%,$(_DEPS))
 
-_OBJ_dfa = aes-crack.o dfa.o
+_OBJ_dfa = dfa.o aes-crack.o aes-sbox.o
 OBJ_dfa = $(patsubst %,$(ODIR)/%,$(_OBJ_dfa))
 
 $(shell mkdir -p $(BUILD))
