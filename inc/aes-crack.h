@@ -14,7 +14,7 @@
  * 
  * @param rows - number of rows for the array
  * @param cols - number of columns for the array
- * @param text - array to perform inverse row shift on  
+ * @param text - array to perform inverse row shift on
  */
 void aes_inverse_row_shift(uint32_t rows, uint32_t cols, uint8_t text[rows][cols]);
 
@@ -23,11 +23,12 @@ void aes_inverse_row_shift(uint32_t rows, uint32_t cols, uint8_t text[rows][cols
  * 
  * @param rows - number of rows for key
  * @param cols - number of columns for key
+ * @param rc - RC for the round key for inverse function g
  * @param key - input key used to calculate key for previous round
  * @param prev_key - output key/previous round key
  *  
  */
-void aes_inverse_key_scheduler(uint32_t rows,
-    uint32_t cols, uint8_t key[rows][cols], uint8_t prev_key[rows][cols]);
+void aes_inverse_key_scheduler(uint32_t rows, uint32_t cols,
+    uint8_t rc, uint8_t key[rows][cols], uint8_t prev_key[rows][cols]);
 
 #endif // _AES_CRACK_H_

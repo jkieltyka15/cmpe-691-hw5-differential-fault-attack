@@ -16,7 +16,6 @@
 #define SBOX_COL_LEN 16
 
 uint8_t sbox[SBOX_ROW_LEN * SBOX_COL_LEN];
-uint8_t inverse_sbox[SBOX_ROW_LEN * SBOX_COL_LEN];
 
 /**
  * Loads an array that is the length of an sbox from a text file.
@@ -68,14 +67,6 @@ bool sbox_load(char* file_path) {
     return array_load(file_path, sbox);
 }
 
-bool inverse_sbox_load(char* file_path) {
-    return array_load(file_path, inverse_sbox);
-}
-
 uint8_t sbox_get(uint8_t byte) {
     return sbox[byte];
-}
-
-uint8_t inverse_sbox_get(uint8_t byte) {
-    return inverse_sbox[byte];
 }
