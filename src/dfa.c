@@ -2,9 +2,10 @@
 #include <stdint.h>
 
 #include "aes-crack.h"
+#include "aes-sbox.h"
 
-#define COL_SIZE  4
-#define ROW_SIZE  4
+#define COL_LEN  4
+#define ROW_LEN  4
 
 #define NUM_OF_FAULTY 3
 
@@ -19,8 +20,8 @@ int main(int argc, char* argv[]) {
     FILE* input_file = NULL;
     FILE* output_file = NULL;
 
-    uint8_t ciphertext[ROW_SIZE][COL_SIZE];
-    uint8_t ciphertext_f[NUM_OF_FAULTY][ROW_SIZE][COL_SIZE];
+    uint8_t ciphertext[ROW_LEN][COL_LEN];
+    uint8_t ciphertext_f[NUM_OF_FAULTY][ROW_LEN][COL_LEN];
 
     char buffer[BUFFER_SIZE];
     uint32_t buffer_index = 0;
@@ -61,9 +62,9 @@ int main(int argc, char* argv[]) {
 
     // parse line of input file with fault free ciphertext
     buffer_index = 0;
-    for (int32_t j = 0; COL_SIZE > j; j++) {
+    for (int32_t j = 0; COL_LEN > j; j++) {
     
-        for (int32_t i = 0; ROW_SIZE > i; i++) {
+        for (int32_t i = 0; ROW_LEN > i; i++) {
         
             byte_as_str[0] = buffer[buffer_index++];
             byte_as_str[1] = buffer[buffer_index++];
@@ -86,9 +87,9 @@ int main(int argc, char* argv[]) {
 
         // parse line of input file with faulty ciphertext
         buffer_index = 0;
-        for (int32_t j = 0; COL_SIZE > j; j++) {
+        for (int32_t j = 0; COL_LEN > j; j++) {
     
-            for (int32_t i = 0; ROW_SIZE > i; i++) {
+            for (int32_t i = 0; ROW_LEN > i; i++) {
 
                 uint8_t hex = 0;
         
@@ -102,6 +103,12 @@ int main(int argc, char* argv[]) {
                 ciphertext_f[z][i][j] = hex;
             }
         }
+    }
+
+    // load sbox
+    if (0 == sbox_load(sbox_file_path)) {
+        perror("failed to load sbox");
+        return 1;
     }
 
     // cleanup
