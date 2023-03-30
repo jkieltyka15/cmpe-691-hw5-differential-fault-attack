@@ -113,6 +113,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // load inverse sbox
+    if (0 == inverse_sbox_load(inverse_sbox_file_path)) {
+        perror("failed to load inverse sbox");
+        return 1;
+    }
+
     // cleanup
     fclose(input_file);
     fclose(output_file);
