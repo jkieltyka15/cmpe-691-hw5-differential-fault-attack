@@ -1,3 +1,9 @@
+/**
+ * File: aes-sbox.h
+ *
+ * Prototypes of sbox functions.
+ */
+
 #ifndef _AES_S_BOX_H_
 #define _AES_S_BOX_H_
 
