@@ -1,7 +1,7 @@
 /**
- * File: aes-sbox.c
+ * File: aes-array.c
  *
- * Implementation of sbox functions.
+ * Implementation of array functions.
  */
 
 #include <stdint.h>
@@ -16,45 +16,66 @@
 #define SBOX_COL_LEN 16
 
 uint8_t sbox[SBOX_ROW_LEN * SBOX_COL_LEN];
+uint8_t inverse_sbox[SBOX_ROW_LEN * SBOX_COL_LEN];
 
-bool sbox_load(char* file_path) {
+/**
+ * Loads an array that is the length of an sbox from a text file.
+ * 
+ * @param file_path - File path used to load the array
+ * @param array - Array to load values into
+ * 
+ * @return True on success, otherwise false
+ */
+bool array_load(char* file_path, uint8_t array[SBOX_ROW_LEN * SBOX_COL_LEN]) {
 
     char buffer[BUFFER_SIZE];
-    uint32_t sbox_index = 0;
+    uint32_t array_index = 0;
 
-    // open sbox file
-    FILE* sbox_file = fopen(file_path, "r");
-    if (NULL == sbox) {
-        perror("failed to open sbox file");
+    // open array file
+    FILE* array_file = fopen(file_path, "r");
+    if (NULL == array) {
+        perror("failed to open array file");
         return false;
     }
 
-    // load sbox
+    // load array
     for (uint32_t i = 0; SBOX_ROW_LEN > i; i++) {
 
-        // read line of sbox file
-        if (NULL == fgets(buffer, sizeof(buffer), sbox_file) && !feof(sbox_file)) {
-            perror("failed to read sbox file line");
+        // read line of array file
+        if (NULL == fgets(buffer, sizeof(buffer), array_file) && !feof(array_file)) {
+            perror("failed to read array file line");
             return false;
         }
 
-        // load buffer to current sbox row
+        // load buffer to current array row
         if (SBOX_COL_LEN != sscanf(buffer,
             "%hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx %hhx",
-            &sbox[sbox_index], &sbox[sbox_index + 1], &sbox[sbox_index + 2], &sbox[sbox_index + 3],
-            &sbox[sbox_index + 4], &sbox[sbox_index + 5], &sbox[sbox_index + 6], &sbox[sbox_index + 7],
-            &sbox[sbox_index + 8], &sbox[sbox_index + 9], &sbox[sbox_index + 10], &sbox[sbox_index + 11],
-            &sbox[sbox_index + 12], &sbox[sbox_index + 13], &sbox[sbox_index + 14], &sbox[sbox_index + 15])) {
+            &array[array_index], &array[array_index + 1], &array[array_index + 2], &array[array_index + 3],
+            &array[array_index + 4], &array[array_index + 5], &array[array_index + 6], &array[array_index + 7],
+            &array[array_index + 8], &array[array_index + 9], &array[array_index + 10], &array[array_index + 11],
+            &array[array_index + 12], &array[array_index + 13], &array[array_index + 14], &array[array_index + 15])) {
 
-            perror("failed to parse sbox line");
+            perror("failed to parse array line");
             return false;
         }
-        sbox_index += SBOX_COL_LEN;
+        array_index += SBOX_COL_LEN;
     }
 
     return true;
 }
 
+bool sbox_load(char* file_path) {
+    return array_load(file_path, sbox);
+}
+
+bool inverse_sbox_load(char* file_path) {
+    return array_load(file_path, inverse_sbox);
+}
+
 uint8_t sbox_get(uint8_t byte) {
     return sbox[byte];
+}
+
+uint8_t inverse_sbox_get(uint8_t byte) {
+    return inverse_sbox[byte];
 }

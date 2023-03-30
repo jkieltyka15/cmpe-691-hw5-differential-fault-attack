@@ -14,6 +14,7 @@
 int main(int argc, char* argv[]) {
 
     char* sbox_file_path = NULL;
+    char* inverse_sbox_file_path = NULL;
     char* input_file_path = NULL;
     char* output_file_path = NULL;
 
@@ -29,15 +30,16 @@ int main(int argc, char* argv[]) {
     char byte_as_str[3];
 
     // check for correct number of arguments
-    if (4 != argc) 
+    if (5 != argc) 
     {
-        perror("Incorrect number of inputs. Expecting: \'./dfa <sbox file path> <input file path> <output file path>\'");
+        perror("Incorrect number of inputs. Expecting: \'./dfa <sbox file path> <inverse sbox file path> <input file path> <output file path>\'");
         return 1;
     }
 
     sbox_file_path = argv[1];
-    input_file_path = argv[2];
-    output_file_path = argv[3];
+    inverse_sbox_file_path = argv[2];
+    input_file_path = argv[3];
+    output_file_path = argv[4];
        
     // open input file
     input_file = fopen(input_file_path, "r");
@@ -108,6 +110,12 @@ int main(int argc, char* argv[]) {
     // load sbox
     if (0 == sbox_load(sbox_file_path)) {
         perror("failed to load sbox");
+        return 1;
+    }
+
+    // load inverse sbox
+    if (0 == inverse_sbox_load(inverse_sbox_file_path)) {
+        perror("failed to load inverse sbox");
         return 1;
     }
 
