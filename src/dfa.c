@@ -116,23 +116,5 @@ int main(int argc, char* argv[]) {
     fclose(input_file);
     fclose(output_file);
 
-    aes_inverse_key_scheduler(ROW_LEN, COL_LEN, 1, ciphertext_f[0], ciphertext_f[1]);
-
-    for(int i = 0; i < ROW_LEN; i++){
-        for(int j = 0; j < COL_LEN; j++){
-            printf("%.2hx ", ciphertext_f[0][i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n\n\n");
-
-    for(int i = 0; i < ROW_LEN; i++){
-        for(int j = 0; j < COL_LEN; j++){
-            printf("%.2hhx ", ciphertext_f[1][i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n\n\n");
-
     return 0;
 }
