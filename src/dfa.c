@@ -14,7 +14,6 @@
 int main(int argc, char* argv[]) {
 
     char* sbox_file_path = NULL;
-    char* inverse_sbox_file_path = NULL;
     char* input_file_path = NULL;
     char* output_file_path = NULL;
 
@@ -30,16 +29,15 @@ int main(int argc, char* argv[]) {
     char byte_as_str[3];
 
     // check for correct number of arguments
-    if (5 != argc) 
+    if (4 != argc) 
     {
-        perror("Incorrect number of inputs. Expecting: \'./dfa <sbox file path> <inverse sbox file path> <input file path> <output file path>\'");
+        perror("Incorrect number of inputs. Expecting: \'./dfa <sbox file path> <input file path> <output file path>\'");
         return 1;
     }
 
     sbox_file_path = argv[1];
-    inverse_sbox_file_path = argv[2];
-    input_file_path = argv[3];
-    output_file_path = argv[4];
+    input_file_path = argv[2];
+    output_file_path = argv[3];
        
     // open input file
     input_file = fopen(input_file_path, "r");
@@ -113,15 +111,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // load inverse sbox
-    if (0 == inverse_sbox_load(inverse_sbox_file_path)) {
-        perror("failed to load inverse sbox");
-        return 1;
-    }
-
     // cleanup
     fclose(input_file);
     fclose(output_file);
+
+    aes_inverse_key_scheduler(ROW_LEN, COL_LEN, 1, ciphertext_f[0], ciphertext_f[1]);
+
+    for(int i = 0; i < ROW_LEN; i++){
+        for(int j = 0; j < COL_LEN; j++){
+            printf("%.2hx ", ciphertext_f[0][i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n\n");
+
+    for(int i = 0; i < ROW_LEN; i++){
+        for(int j = 0; j < COL_LEN; j++){
+            printf("%.2hhx ", ciphertext_f[1][i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n\n");
 
     return 0;
 }
