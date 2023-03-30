@@ -3,6 +3,7 @@
 
 #include "aes-crack.h"
 #include "aes-sbox.h"
+#include "mvalue.h"
 
 #define COL_LEN  4
 #define ROW_LEN  4
