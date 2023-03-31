@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     char buffer[BUFFER_SIZE];
     uint32_t buffer_index = 0;
 
+    uint8_t mvalue_matched[ROW_LEN][COL_LEN];
     uint8_t key[NUM_OF_KEYS][ROW_LEN][COL_LEN];
     uint8_t rc = 128;
 
@@ -151,17 +152,8 @@ int main(int argc, char* argv[]) {
                 }
 
                 // get next fault value
-                fault <<= 2;
+                fault <<= 1;
             }
-
-            // for (uint32_t a = 0; NUM_OF_FAULTY > a; a++) {
-            //     for (uint32_t b = 0; mvalue[a].length > b; b++)
-            //     {
-            //         printf("%.2hhx ", mvalue[a].value[b]);
-            //     }
-            //     printf("\n");
-            // }
-            // printf("\n\n");
 
             // find intersection to determine key byte
             for (uint32_t a = 0; mvalue[0].length > a; a++) {
@@ -169,9 +161,8 @@ int main(int argc, char* argv[]) {
                 for (uint32_t b = 0; mvalue[1].length > b && !key_byte_found; b++) {
                     for (uint32_t c = 0; mvalue[2].length > c && !key_byte_found; c++) {
                         if (mvalue[0].value[a] == mvalue[1].value[b]
-                            || mvalue[0].value[a] == mvalue[2].value[c]
-                            || mvalue[1].value[b] == mvalue[2].value[c]) {
-                                key[NUM_OF_KEYS - 1][i][j] = sbox_get(mvalue[0].value[a]);
+                            && mvalue[1].value[b] == mvalue[2].value[c]) {
+                                mvalue_matched[i][j] = sbox_get(mvalue[0].value[a]);
                                 key_byte_found = 1;
                         }
                     }
@@ -183,8 +174,19 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // perform AES rowshift
+    aes_inverse_row_shift(COL_LEN, ROW_LEN, mvalue_matched);
+
+    // perform xor with ciphertext
+    for (uint32_t i = 0; COL_LEN > i; i++) {
+        for (uint32_t j = 0; ROW_LEN > j; j++) {
+            key[NUM_OF_KEYS - 1][i][j] = mvalue_matched[i][j] ^ ciphertext[i][j]; 
+        }
+    }
+
     // perform the inverse AES key scheduler
-    for (int32_t round = NUM_OF_KEYS - 2; 0 <= round; round--) {
+    aes_inverse_key_scheduler(ROW_LEN, COL_LEN, 54, key[NUM_OF_KEYS - 1], key[NUM_OF_KEYS - 2]);
+    for (int32_t round = NUM_OF_KEYS - 3; 0 <= round; round--) {
         aes_inverse_key_scheduler(ROW_LEN, COL_LEN, rc, key[round + 1], key[round]);
         rc >>= 1;
     }
