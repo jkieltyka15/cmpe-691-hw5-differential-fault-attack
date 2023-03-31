@@ -9,6 +9,10 @@
 #define ROW_LEN  4
 
 #define NUM_OF_FAULTY 3
+#define NUM_OF_KEYS   11
+#define NUM_OF_FAULTS 8
+
+#define MAX_BYTE_VAL 255 
 
 #define BUFFER_SIZE 1024
 
@@ -26,6 +30,8 @@ int main(int argc, char* argv[]) {
 
     char buffer[BUFFER_SIZE];
     uint32_t buffer_index = 0;
+
+    uint8_t key[NUM_OF_KEYS][ROW_LEN][COL_LEN];
 
     char byte_as_str[3];
 
@@ -110,6 +116,70 @@ int main(int argc, char* argv[]) {
     if (0 == sbox_load(sbox_file_path)) {
         perror("failed to load sbox");
         return 1;
+    }
+
+    // discover mvalues for each faulty ciphertext
+    for (uint32_t i = 0; ROW_LEN > i; i++) {
+        for (uint32_t j = 0; COL_LEN > j; j++) {
+
+            mvalue_t mvalue[NUM_OF_FAULTY];
+            uint8_t fault = 1;
+
+            // initialize mvalues
+            for (uint32_t y = 0; NUM_OF_FAULTY > y; y++) {
+                mvalue_init(&mvalue[y]);
+            }
+
+            // calculate XORs of faulty and non-faulty ciphertexts
+            uint32_t c_xor_d[NUM_OF_FAULTY];
+            for (uint32_t y = 0; NUM_OF_FAULTY > y; y++) {
+                c_xor_d[y] = ciphertext[i][j] ^ ciphertext_f[y][i][j];
+            }
+
+            for (uint32_t z = 0; 8 > z; z++) {
+
+                // find mvalue
+                uint32_t value = 0;
+                for (uint32_t value_32 = 0; MAX_BYTE_VAL >= value_32; value_32++) {
+                    for (uint32_t y = 0; NUM_OF_FAULTY > y; y++) {
+                        if (c_xor_d[y] == (sbox_get(value) ^ sbox_get(value ^ fault))) {
+                            mvalue_add(&mvalue[y], value);
+                        }
+                    }
+                    value += 1;
+                }
+
+                // get next fault value
+                fault <<= 2;
+            }
+
+            // for (uint32_t a = 0; NUM_OF_FAULTY > a; a++) {
+            //     for (uint32_t b = 0; mvalue[a].length > b; b++)
+            //     {
+            //         printf("%.2hhx ", mvalue[a].value[b]);
+            //     }
+            //     printf("\n");
+            // }
+            // printf("\n\n");
+
+            // find intersection to determine key byte
+            for (uint32_t a = 0; mvalue[0].length > a; a++) {
+                uint32_t key_byte_found = 0;
+                for (uint32_t b = 0; mvalue[1].length > b && !key_byte_found; b++) {
+                    for (uint32_t c = 0; mvalue[2].length > c && !key_byte_found; c++) {
+                        if (mvalue[0].value[a] == mvalue[1].value[b]
+                            || mvalue[0].value[a] == mvalue[2].value[c]
+                            || mvalue[1].value[b] == mvalue[2].value[c]) {
+                                key[NUM_OF_KEYS - 1][i][j] = sbox_get(mvalue[0].value[a]);
+                                key_byte_found = 1;
+                        }
+                    }
+                }
+                if (key_byte_found) {
+                    break;
+                }
+            }
+        }
     }
 
     // cleanup

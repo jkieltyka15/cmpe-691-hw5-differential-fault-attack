@@ -18,6 +18,13 @@ typedef struct
 } mvalue_t;
 
 /**
+ * Intialize mvalue.
+ * 
+ * @param mvalue mvalue to be initialized 
+ */
+void mvalue_init(mvalue_t* mvalue);
+
+/**
  * Add a value to the mvalue list.
  * 
  * @param value - value to be added
