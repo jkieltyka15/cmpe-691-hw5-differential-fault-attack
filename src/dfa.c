@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
     uint32_t buffer_index = 0;
 
     uint8_t key[NUM_OF_KEYS][ROW_LEN][COL_LEN];
+    uint8_t rc = 128;
 
     char byte_as_str[3];
 
@@ -180,6 +181,23 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+    }
+
+    // perform the inverse AES key scheduler
+    for (int32_t round = NUM_OF_KEYS - 2; 0 <= round; round--) {
+        aes_inverse_key_scheduler(ROW_LEN, COL_LEN, rc, key[round + 1], key[round]);
+        rc >>= 1;
+    }
+
+    // print keys to file
+    for (uint32_t round = 0; NUM_OF_KEYS > round; round++) {
+        fprintf(output_file, "round %u key: ", round);
+        for (uint32_t j = 0; COL_LEN > j; j++) {
+            for (uint32_t i = 0; ROW_LEN > i; i++) {
+                fprintf(output_file, "%.2hhx", key[round][i][j]);
+            }
+        }
+        fprintf(output_file, "\n");
     }
 
     // cleanup
