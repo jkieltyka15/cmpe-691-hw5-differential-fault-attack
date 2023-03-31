@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     char buffer[BUFFER_SIZE];
     uint32_t buffer_index = 0;
 
+    uint8_t mvalue_matched[ROW_LEN][COL_LEN];
     uint8_t key[NUM_OF_KEYS][ROW_LEN][COL_LEN];
     uint8_t rc = 128;
 
@@ -171,7 +172,7 @@ int main(int argc, char* argv[]) {
                         if (mvalue[0].value[a] == mvalue[1].value[b]
                             || mvalue[0].value[a] == mvalue[2].value[c]
                             || mvalue[1].value[b] == mvalue[2].value[c]) {
-                                key[NUM_OF_KEYS - 1][i][j] = sbox_get(mvalue[0].value[a]);
+                                mvalue_matched[i][j] = sbox_get(mvalue[0].value[a]);
                                 key_byte_found = 1;
                         }
                     }
@@ -180,6 +181,16 @@ int main(int argc, char* argv[]) {
                     break;
                 }
             }
+        }
+    }
+
+    // perform AES rowshift
+    aes_inverse_row_shift(COL_LEN, ROW_LEN, mvalue_matched);
+
+    // perform xor with ciphertext
+    for (uint32_t i = 0; COL_LEN > i; i++) {
+        for (uint32_t j = 0; ROW_LEN > j; j++) {
+            key[NUM_OF_KEYS - 1][i][j] = mvalue_matched[i][j] ^ ciphertext[i][j]; 
         }
     }
 
