@@ -10,7 +10,7 @@ Prerequisites: gcc with C11 compiler using Linux
 Build and Test:
     1) To build, use command 'make dfa' in the 'project root' directory.
     2) To perform parsing, use command:
-       './build/bin/dfa ./res/sbox.txt ./res/inverse-sbox.txt ./data/in.txt ./data/out.txt' 
+       './build/bin/dfa ./res/sbox.txt ./data/in.txt ./data/out.txt' 
        in the 'project root' directory.
     3) Output will be in 'out.txt' in the 'data' directory.
 
